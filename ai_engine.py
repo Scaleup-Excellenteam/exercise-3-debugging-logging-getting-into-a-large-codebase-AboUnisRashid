@@ -6,6 +6,7 @@
 # Note: Code inspired from the pseudocode by Sebastian Lague
 # from enums import Player
 # TODO: switch undo moves to stack data structure
+import logging     # added
 import chess_engine
 from enums import Player
 
@@ -73,7 +74,7 @@ class chess_ai:
             else:
                 return min_evaluation
 
-    def minimax_black(self, game_state, depth, alpha, beta, maximizing_player, player_color):
+    def minimax_black(self, game_state, depth, alpha, beta, maximizing_player):
         csc = game_state.checkmate_stalemate_checker()
         if maximizing_player:
             if csc == 1:
@@ -98,7 +99,7 @@ class chess_ai:
             all_possible_moves = game_state.get_all_legal_moves("white")
             for move_pair in all_possible_moves:
                 game_state.move_piece(move_pair[0], move_pair[1], True)
-                evaluation = self.minimax_black(game_state, depth - 1, alpha, beta, False, "black")
+                evaluation = self.minimax_black(game_state, depth - 1, alpha, beta, False)
                 game_state.undo_move()
 
                 if max_evaluation < evaluation:
@@ -116,7 +117,7 @@ class chess_ai:
             all_possible_moves = game_state.get_all_legal_moves("black")
             for move_pair in all_possible_moves:
                 game_state.move_piece(move_pair[0], move_pair[1], True)
-                evaluation = self.minimax_black(game_state, depth - 1, alpha, beta, True, "white")
+                evaluation = self.minimax_black(game_state, depth - 1, alpha, beta, True)
                 game_state.undo_move()
 
                 if min_evaluation > evaluation:
@@ -141,56 +142,56 @@ class chess_ai:
 
     def get_piece_value(self, piece, player):
         if player is Player.PLAYER_1:
-            if piece.is_player("black"):
-                if piece.get_name() is "k":
+            if piece.is_player("white"):    # fixed
+                if piece.get_name() == "k":
                     return -1000
-                elif piece.get_name() is "q":
+                elif piece.get_name() == "q":
                     return -100
-                elif piece.get_name() is "r":
+                elif piece.get_name() == "r":
                     return -50
-                elif piece.get_name() is "b":
+                elif piece.get_name() == "b":
                     return -30
-                elif piece.get_name() is "n":
+                elif piece.get_name() == "n":
                     return -30
-                elif piece.get_name() is "p":
+                elif piece.get_name() == "p":
                     return -10
             else:
-                if piece.get_name() is "k":
+                if piece.get_name() == "k":
                     return 1000
-                elif piece.get_name() is "q":
+                elif piece.get_name() == "q":
                     return 100
-                elif piece.get_name() is "r":
+                elif piece.get_name() == "r":
                     return 50
-                elif piece.get_name() is "b":
+                elif piece.get_name() == "b":
                     return 30
-                elif piece.get_name() is "n":
+                elif piece.get_name() == "n":
                     return 30
-                elif piece.get_name() is "p":
+                elif piece.get_name() == "p":
                     return 10
         else:
             if piece.is_player("white"):
-                if piece.get_name() is "k":
+                if piece.get_name() == "k":
                     return 1000
-                elif piece.get_name() is "q":
+                elif piece.get_name() == "q":
                     return 100
-                elif piece.get_name() is "r":
+                elif piece.get_name() == "r":
                     return 50
-                elif piece.get_name() is "b":
+                elif piece.get_name() == "b":
                     return 30
-                elif piece.get_name() is "n":
+                elif piece.get_name() == "n":
                     return 30
-                elif piece.get_name() is "p":
+                elif piece.get_name() == "p":
                     return 10
             else:
-                if piece.get_name() is "k":
+                if piece.get_name() == "k":
                     return -1000
-                elif piece.get_name() is "q":
+                elif piece.get_name() == "q":
                     return -100
-                elif piece.get_name() is "r":
+                elif piece.get_name() == "r":
                     return -50
-                elif piece.get_name() is "b":
+                elif piece.get_name() == "b":
                     return -30
-                elif piece.get_name() is "n":
+                elif piece.get_name() == "n":
                     return -30
-                elif piece.get_name() is "p":
+                elif piece.get_name() == "p":
                     return -10

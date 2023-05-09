@@ -7,9 +7,14 @@
 #
 import chess_engine
 import pygame as py
+import logging  # added
 
 import ai_engine
 from enums import Player
+
+# added
+logging.basicConfig(level=logging.INFO, filename="logs_file.log", filemode="w",
+                    format="%(asctime)s - %(levelname)s %(message)s")
 
 """Variables"""
 WIDTH = HEIGHT = 512  # width and height of the chess board
@@ -18,6 +23,7 @@ SQ_SIZE = HEIGHT // DIMENSION  # the size of each of the squares in the board
 MAX_FPS = 15  # FPS for animations
 IMAGES = {}  # images for the chess pieces
 colors = [py.Color("white"), py.Color("gray")]
+
 
 # TODO: AI black has been worked on. Mirror progress for other two modes
 def load_images():
@@ -122,8 +128,11 @@ def main():
     ai = ai_engine.chess_ai()
     game_state = chess_engine.game_state()
     if human_player is 'b':
+        logging.info("Computer started.")   # added
         ai_move = ai.minimax_black(game_state, 3, -100000, 100000, True, Player.PLAYER_1)
         game_state.move_piece(ai_move[0], ai_move[1], True)
+    else:
+        logging.info("Human started.")  # added
 
     while running:
         for e in py.event.get():
@@ -163,6 +172,8 @@ def main():
                         valid_moves = game_state.get_valid_moves((row, col))
                         if valid_moves is None:
                             valid_moves = []
+
+
             elif e.type == py.KEYDOWN:
                 if e.key == py.K_r:
                     game_over = False
@@ -177,15 +188,45 @@ def main():
 
         draw_game_state(screen, game_state, valid_moves, square_selected)
 
-        endgame = game_state.checkmate_stalemate_checker()
+        if not game_over:   # added to prevent repeated file logs
+            # moved inside the if statement to prevent repeated print console logs
+            endgame = game_state.checkmate_stalemate_checker()
+            if endgame == 0:
+                game_over = True
+                logging.info("Black wins.")     # added
+                logging.info(f"Knights moves in total: {game_state.knights_moves_count}")   # added
+                logging.info(
+                    f"total turns survived (white): {sum([piece.get_age() for piece in game_state.white_pieces])}")
+                logging.info(
+                    f"total turns survived (black): {sum([piece.get_age() for piece in game_state.black_pieces])}")
+                logging.info(f"total checking moves : {game_state.checking_counter}")  # added
+
+            elif endgame == 1:
+                game_over = True
+                logging.info("White wins.")     # added
+                logging.info(f"Knights moves in total: {game_state.knights_moves_count}")  # added
+                logging.info(
+                    f"total turns survived (white): {sum([piece.get_age() for piece in game_state.white_pieces])}")
+                logging.info(
+                    f"total turns survived (black): {sum([piece.get_age() for piece in game_state.black_pieces])}")
+                logging.info(f"total checking moves : {game_state.checking_counter}")  # added
+
+            elif endgame == 2:
+                game_over = True
+                logging.info("Stalemate.")      # added
+                logging.info(f"Knights moves in total: {game_state.knights_moves_count}")  # added
+                logging.info(
+                    f"total turns survived (white): {sum([piece.get_age() for piece in game_state.white_pieces])}")
+                logging.info(
+                    f"total turns survived (white): {sum([piece.get_age() for piece in game_state.black_pieces])}")
+                logging.info(f"total checking moves : {game_state.checking_counter}")  # added
+
+        # moved this block outside, so it can keep looping
         if endgame == 0:
-            game_over = True
             draw_text(screen, "Black wins.")
         elif endgame == 1:
-            game_over = True
             draw_text(screen, "White wins.")
         elif endgame == 2:
-            game_over = True
             draw_text(screen, "Stalemate.")
 
         clock.tick(MAX_FPS)

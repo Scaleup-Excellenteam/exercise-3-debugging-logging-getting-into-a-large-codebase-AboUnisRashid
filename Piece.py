@@ -3,6 +3,8 @@
 #
 # TODO: add checking if check after moving suggested move later
 
+import logging  # added
+
 # General chess piece
 from enums import Player
 
@@ -14,6 +16,7 @@ class Piece:
         self.row_number = row_number
         self.col_number = col_number
         self._player = player
+        self._age = 0   # added
 
     # Get the x value
     def get_row_number(self):
@@ -54,6 +57,14 @@ class Piece:
     # Get moves
     def get_valid_piece_moves(self, board):
         pass
+
+    # added
+    def increment_age(self):
+        self._age += 1
+
+    # added
+    def get_age(self):
+        return self._age
 
 
 # Rook (R)
@@ -163,7 +174,7 @@ class Knight(Piece):
         row_change = [-2, -2, -1, -1, +1, +1, +2, +2]
         col_change = [-1, +1, -2, +2, -2, +2, +1, -1]
 
-        for i in range(0, 6):
+        for i in range(0, 8):       # fixed. for i in range(0, 6):
             new_row = self.get_row_number() + row_change[i]
             new_col = self.get_col_number() + col_change[i]
             evaluating_square = game_state.get_piece(new_row, new_col)
